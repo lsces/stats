@@ -9,8 +9,11 @@
 /**
  * required setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
-include_once ( STATS_PKG_CLASS_PATH.'Statistics.php');
+use Bitweaver\BitBase;
+use Bitweaver\KernelTools;
+use Bitweaver\Stats\Statistics;
+ 
+require_once '../kernel/includes/setup_inc.php';
 
 $gBitSystem->verifyPackage( 'stats' );
 $gBitSystem->verifyFeature( 'stats_referers' );
@@ -19,7 +22,7 @@ $gBitSystem->verifyPermission( 'p_stats_view_referer' );
 $gStats = new Statistics();
 
 if( empty( $_REQUEST['period'] ) || empty( $_REQUEST['timeframe'] ) ) {
-	bit_redirect( STATS_PKG_URL.'users.php' );
+	KernelTools::bit_redirect( STATS_PKG_URL.'users.php' );
 }
 
 // get rid of all referers in the database
@@ -30,7 +33,7 @@ $referers = $gStats->getRefererList( $_REQUEST );
 $totalRegistrations = 0;
 $maxRegistrations = 0;
 
-$aggregateStats = array();
+$aggregateStats = [];
 foreach( array_keys( $referers ) as $refSite ) {
 	$refSiteCount = count( $referers[$refSite] );
 	$totalRegistrations += $refSiteCount;
@@ -40,23 +43,23 @@ foreach( array_keys( $referers ) as $refSite ) {
 
 	foreach( array_keys( $referers[$refSite] ) as $r ) {
 		$url = parse_url( $referers[$refSite][$r]['referer_url'] );
-		$revenue = array();
+		$revenue = [];
 		if( $gBitSystem->isPackageActive( 'bitcommerce' ) ) {
-			require_once( BITCOMMERCE_PKG_INCLUDE_PATH.'bitcommerce_start_inc.php' );
-			require_once( BITCOMMERCE_PKG_CLASS_PATH.'CommerceStatistics.php' );
-			$revenue = $gCommerceStatistics->getCustomerRevenue( array( 'customers_id' => $referers[$refSite][$r]['user_id'] ) );
+			require_once BITCOMMERCE_PKG_INCLUDE_PATH . 'bitcommerce_start_inc.php';
+			require_once BITCOMMERCE_PKG_CLASS_PATH . 'CommerceStatistics.php';
+			$revenue = $gCommerceStatistics->getCustomerRevenue( [ 'customers_id' => $referers[$refSite][$r]['user_id'] ] );
 			$referers[$refSite][$r]['revenue'] = $revenue;
-			$subVals = array( $refSite );
+			$subVals = [ $refSite ];
 			if( !empty( $url['query'] ) ) {
-				$urlParams = array();
+			$urlParams = [];
 				parse_str( $url['query'], $urlParams );
 				if( !empty( $urlParams['adurl'] ) ) {
 					$adUrl = parse_url( $urlParams['adurl'] );
 					if( !empty( $adUrl['query'] ) ) {
 						array_push( $subVals, 'PPC' );
-						$adParams = array();
+					$adParams = [];
 						parse_str( $adUrl['query'], $adParams );
-						foreach( array( 'ctm_campaign', 'ctm_adgroup', 'ctm_term' ) as $subKey ) {
+						foreach( [ 'ctm_campaign', 'ctm_adgroup', 'ctm_term' ] as $subKey ) {
 							if( isset( $adParams[$subKey] ) ) {
 								$subKeyVal = !empty( $adParams[$subKey] ) ? $adParams[$subKey] : 'unknown' ;
 								array_push( $subVals, $subKeyVal );
@@ -144,10 +147,10 @@ $gBitThemes->loadCss( STATS_PKG_PATH.'css/stats.css');
 $gBitThemes->loadCss( CONFIG_PKG_PATH.'themes/bootstrap/bootstrap-table/bootstrap-table.css');
 $gBitThemes->loadJavascript( CONFIG_PKG_PATH.'themes/bootstrap/bootstrap-table/bootstrap-table.js');
 
-$gBitSmarty->assignByRef( 'aggregateStats', $aggregateStats );
-$gBitSmarty->assignByRef( 'referers', $referers );
+$gBitSmarty->assign( 'aggregateStats', $aggregateStats );
+$gBitSmarty->assign( 'referers', $referers );
 $gBitSmarty->assign( 'totalRegistrations', $totalRegistrations );
 $gBitSmarty->assign( 'maxRegistrations', $maxRegistrations );
 $gBitSmarty->assign( 'listInfo', $_REQUEST['listInfo'] );
-$gBitSystem->display( 'bitpackage:stats/referrer_stats.tpl', tra( 'Referer Statistics' ), array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:stats/referrer_stats.tpl', KernelTools::tra( 'Referer Statistics' ), [ 'display_mode' => 'display' ]);
 

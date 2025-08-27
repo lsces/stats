@@ -1,28 +1,39 @@
 <?php
+use Bitweaver\Stats\Statistics;
+
 global $gBitSystem, $gBitUser ;
 
-$registerHash = array(
+$pRegisterHash = [
 	'package_name' => 'stats',
-	'package_path' => dirname( dirname( __FILE__ ) ).'/',
-);
-$gBitSystem->registerPackage( $registerHash );
+	'package_path' => dirname( dirname( __FILE__ ) ) . '/',
+];
+
+// fix to quieten down VS Code which can't see the dynamic creation of these ...
+define( 'STATS_PKG_NAME', $pRegisterHash['package_name'] );
+define( 'STATS_PKG_URL', BIT_ROOT_URL . basename( $pRegisterHash['package_path'] ) . '/' );
+define( 'STATS_PKG_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/' );
+define( 'STATS_PKG_INCLUDE_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/'); 
+define( 'STATS_PKG_CLASS_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/classes/');
+define( 'STATS_PKG_ADMIN_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/admin/'); 
+
+$gBitSystem->registerPackage( $pRegisterHash );
 
 if( $gBitSystem->isPackageActive( 'stats' )) {
 	if( $gBitUser->hasPermission( 'p_stats_view' ) || $gBitUser->hasPermission( 'p_stats_view_referer' ) ) {
-		$menuHash = array(
+		$menuHash = [
 			'package_name'  => STATS_PKG_NAME,
-			'index_url'     => STATS_PKG_URL.'index.php',
+			'index_url'     => STATS_PKG_URL . 'index.php',
 			'menu_template' => 'bitpackage:stats/menu_stats.tpl',
-		);
+		];
 		$gBitSystem->registerAppMenu( $menuHash );
 	}
 
-	$gLibertySystem->registerService( STATS_PKG_NAME, STATS_PKG_NAME, array(
-			'users_expunge_function'	=> 'stats_user_expunge',
-			'users_register_function'   => 'stats_user_register',
-	) );
+	$gLibertySystem->registerService( STATS_PKG_NAME, STATS_PKG_NAME, [
+		'users_expunge_function'  => 'stats_user_expunge',
+		'users_register_function' => 'stats_user_register',
+	] );
 
-	require_once( STATS_PKG_CLASS_PATH.'Statistics.php' );
+	require_once STATS_PKG_CLASS_PATH . 'Statistics.php';
 	$stats = new Statistics();
 	if( $gBitSystem->isFeatureActive('stats_pageviews') ) {
 		$stats->addPageview();
@@ -49,7 +60,7 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 	function stats_user_expunge( &$pObject ) {
 		if( is_a( $pObject, 'BitUser' ) && !empty( $pObject->mUserId ) ) {
 			$pObject->StartTrans();
-			$pObject->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."stats_referer_users_map` WHERE user_id=?", array( $pObject->mUserId ) );
+			$pObject->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."stats_referer_users_map` WHERE user_id=?", [ $pObject->mUserId ] );
 			$pObject->CompleteTrans();
 		}
 	}
@@ -57,11 +68,11 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 	function stats_user_register( &$pObject ) {
 		if( !empty( $_COOKIE['referer_url'] ) && is_a( $pObject, 'BitUser' ) && !empty( $pObject->mUserId ) ) {
 			$pObject->StartTrans();
-			if( !$refererId = $pObject->mDb->getOne( "SELECT `referer_url_id` FROM `".BIT_DB_PREFIX."stats_referer_urls` WHERE `referer_url`=?", array(  $_COOKIE['referer_url'] ) ) ) {
+			if( !$refererId = $pObject->mDb->getOne( "SELECT `referer_url_id` FROM `".BIT_DB_PREFIX."stats_referer_urls` WHERE `referer_url`=?", [ $_COOKIE['referer_url'] ] ) ) {
 				$refererId = $pObject->mDb->GenID( 'stats_referer_url_id_seq' );
-				$pObject->mDb->query( "INSERT INTO `".BIT_DB_PREFIX."stats_referer_urls` (`referer_url_id`,`referer_url`) VALUES(?,?)", array( $refererId, $_COOKIE['referer_url'] ) );
+				$pObject->mDb->query( "INSERT INTO `".BIT_DB_PREFIX."stats_referer_urls` (`referer_url_id`,`referer_url`) VALUES(?,?)", [ $refererId, $_COOKIE['referer_url'] ] );
 			}
-			$pObject->mDb->query( "INSERT INTO `".BIT_DB_PREFIX."stats_referer_users_map` (`user_id`,`referer_url_id`) VALUES(?,?)", array( $pObject->mUserId, $refererId ) );
+			$pObject->mDb->query( "INSERT INTO `".BIT_DB_PREFIX."stats_referer_users_map` (`user_id`,`referer_url_id`) VALUES(?,?)", [ $pObject->mUserId, $refererId ] );
 			$pObject->CompleteTrans();
 		}
 	}
@@ -71,10 +82,10 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 		if( ($urlHash = parse_url( $pRefererUrl )) && !empty( $urlHash['host'] ) ) {
 			$ret = $urlHash['host'];
 			// q= google and bing search param, p= yahoo search param
-			$searchStrings = array( 'q', 'p' );
+			$searchStrings = [ 'q', 'p' ];
 			foreach( $searchStrings as $param ) {
 				if( !empty( $urlHash['query'] ) && strpos( $urlHash['query'], $param.'=' ) !== FALSE ) {
-					$result = array();
+					$result = [];
 					parse_str( $urlHash['query'], $result );
 					if( !empty( $result[$param] ) ) {
 						$ret .= '/...'.$param.'='.$result[$param];

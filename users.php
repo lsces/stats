@@ -13,14 +13,16 @@
 /**
  * Required files
  */
-require_once( '../kernel/includes/setup_inc.php' );
-require_once( STATS_PKG_CLASS_PATH.'Statistics.php' );
+use Bitweaver\KernelTools;
+use Bitweaver\Stats\Statistics;
+
+require_once '../kernel/includes/setup_inc.php';
 
 $stats = new Statistics();
 
 $gBitSystem->verifyPackage( 'stats' );
 $gBitSystem->verifyPermission( 'p_stats_view' );
-$periodHash = array( 'day' => 'Daily', 'week' => 'Weekly', 'month' => 'Monthly', 'quarter' => 'Quarterly', 'year' => 'Yearly' );
+$periodHash = [ 'day' => 'Daily', 'week' => 'Weekly', 'month' => 'Monthly', 'quarter' => 'Quarterly', 'year' => 'Yearly' ];
 $gBitSmarty->assign( 'periodHash', $periodHash );
 
 if( !isset( $_REQUEST["period"] )) {
@@ -49,12 +51,11 @@ switch( $_REQUEST["period"] ) {
 if( !empty( $_REQUEST['itemize'] ) ) {
 	$listHash['registration_period'] = $_REQUEST['itemize'];
 	$listHash['registration_period_format'] = $format;
-	bit_redirect( USERS_PKG_URL.'admin/index.php?registration_period='.urlencode( $_REQUEST['itemize'] ).'&registration_period_format='.urlencode( $listHash['registration_period_format'] ) );
+	KernelTools::bit_redirect( USERS_PKG_URL.'admin/index.php?registration_period='.urlencode( $_REQUEST['itemize'] ).'&registration_period_format='.urlencode( $listHash['registration_period_format'] ) );
 }
 
 $gBitSmarty->assign( 'userStats', $stats->registrationStats( $format ));
 $gBitSmarty->assign( 'period', $_REQUEST["period"] );
 
 // Display the template
-$gBitSystem->display( 'bitpackage:stats/user_stats.tpl', NULL, array( 'display_mode' => 'display' ));
-?>
+$gBitSystem->display( 'bitpackage:stats/user_stats.tpl', NULL, [ 'display_mode' => 'display' ]);

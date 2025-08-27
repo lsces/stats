@@ -16,7 +16,7 @@
 /**
  * required setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
+require_once '../kernel/includes/setup_inc.php';
 include_once( STATS_PKG_PATH . "Statistics.php" );
 include_once( UTIL_PKG_INCLUDE_PATH . "phplot.php" );
 global $gBitSystem;
@@ -26,11 +26,11 @@ $gBitSystem->verifyPermission( 'p_stats_view' );
 
 $stats = new Statistics();
 
-$data = $stats->getContentTypeChartData( !empty( $_REQUEST['content_type_guid'] ) ? $_REQUEST['content_type_guid'] : NULL );
+$data = $stats->getContentTypeChartData( !empty( $_REQUEST['content_type_guid'] ) ? $_REQUEST['content_type_guid'] : null );
 $chart_type = !empty( $_REQUEST['chart_type'] ) ? $_REQUEST['chart_type'] : 'bars';
 
 // initialise phplot and insert data
-$graph =& new PHPlot( 600, 400 * ( count( $data['data'] ) ) );
+$graph = new PHPlot( 600, 400 * ( count( $data['data'] ) ) );
 $graph->SetPrintImage(0);
 $graph->SetPlotType( $chart_type );
 $graph->SetXTickPos( 'none' );
@@ -41,7 +41,7 @@ $graph->SetXLabel( tra( 'Title' ) );
 $i = 0;
 foreach( $data['data'] as $guid => $info ) {
 	$graph->SetDataValues( $info );
-	$graph->SetDrawXDataLabels( TRUE );
+	$graph->SetDrawXDataLabels( true );
 	$graph->SetXLabelAngle( ( count( $info ) > 5 ) ? 90 : 0 );
 	$graph->SetNewPlotAreaPixels( 75, 30 + ( $i * 390 ), 580, 370 + ( $i * 390 ) );
 	if( !empty( $_REQUEST['content_type_guid'] ) ) {

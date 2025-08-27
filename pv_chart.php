@@ -16,9 +16,11 @@
 /**
  * required setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
-include_once( STATS_PKG_PATH . "Statistics.php" );
-include_once( UTIL_PKG_INCLUDE_PATH . "phplot.php" );
+use Bitweaver\KernelTools;
+use Bitweaver\Stats\Statistics;
+
+require_once '../kernel/includes/setup_inc.php';
+include_once UTIL_PKG_INCLUDE_PATH . "phplot.php";
 
 $gBitSystem->isPackageActive( 'stats' );
 $gBitSystem->verifyPermission( 'p_stats_view' );
@@ -29,14 +31,13 @@ $days = isset( $_REQUEST["days"] ) ? $_REQUEST['days'] : 7;
 $data = $stats->getPageviewChartData( $days );
 
 // initialise phplot and insert data
-$graph =& new PHPlot( 600, 600 );
+$graph = new PHPlot( 600, 600 );
 $graph->SetDataValues( $data );
-$graph->SetTitle( tra( 'Total Pageviews' ) );
-$graph->SetYTitle( tra( 'Pageviews' ) );
-$graph->SetXTitle( tra( 'Time') ); 
+$graph->SetTitle( KernelTools::tra( 'Total Pageviews' ) );
+$graph->SetYTitle( KernelTools::tra( 'Pageviews' ) );
+$graph->SetXTitle( KernelTools::tra( 'Time') ); 
 $graph->SetPlotType( ( count( $data ) > 50 ) ? 'lines' : 'linepoints' );
-$graph->SetDrawXDataLabels( TRUE );
+$graph->SetDrawXDataLabels( true );
 $graph->SetXLabelAngle( 90 );
 $graph->SetXTickPos('none');
 $graph->DrawGraph();
-?>

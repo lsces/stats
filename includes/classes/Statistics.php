@@ -4,15 +4,26 @@
  *
  * $Id$
  * @package stats
- */
+**/
 
 /**
  * @package stats
  * @subpackage Stats
- */
+**/
+namespace Bitweaver\Stats;
+use Bitweaver\BitBase;
+use Bitweaver\Liberty\LibertyContent;
+use Bitweaver\BitDb;
+
+
 class Statistics extends BitBase {
 
-	public static function prepGetList( &$pListHash ) {
+	/**
+	 * Summary of prepGetList
+	 * @param array $pListHash
+	 * @return void
+	 */
+	public static function prepGetList( &$pListHash ): void {
 
 		if( !empty( $pListHash['period'] ) ) {
 			$pListHash['period_format'] = BitDb::getPeriodFormat( $pListHash['period'] );
@@ -25,14 +36,13 @@ class Statistics extends BitBase {
 	 * getRefererList gets a list of referers
 	 *
 	 * @param array $pListHash
-	 * @access public
 	 * @return array of referers
 	 */
-	function getRefererList( &$pListHash ) {
+	public function getRefererList( &$pListHash ) {
 		global $gBitSystem;
 		$hashKey = '';
 
-		$ret = $bindVars = array();
+		$ret = $bindVars = [];
 		$selectSql = $joinSql = $whereSql = $groupSql = "";
 
 		$hashSql = "uu.`user_id` AS `hash_key`, ";
@@ -72,7 +82,7 @@ class Statistics extends BitBase {
 					 	LEFT JOIN `".BIT_DB_PREFIX."stats_referer_users_map` srum ON(uu.`user_id`=srum.`user_id`)
 						LEFT JOIN  `".BIT_DB_PREFIX."stats_referer_urls` sru ON (sru.`referer_url_id`=srum.`referer_url_id`)
 				$whereSql ORDER BY ".$this->mDb->convertSortmode( $pListHash['sort_mode'] );
-		if( $rs = $this->mDb->query( $query, $bindVars, -1, $pListHash['offset'], ($gBitSystem->isLive() ? 3600 : BIT_QUERY_DEFAULT) ) ) {
+		if( $rs = $this->mDb->query( $query, $bindVars, -1, $pListHash['offset'], $gBitSystem->isLive() ? 3600 : BIT_QUERY_DEFAULT ) ) {
 
 			while( $row = $rs->fetchRow() ) {
 				$key = $row['hash_key'];
@@ -96,33 +106,31 @@ class Statistics extends BitBase {
 		LibertyContent::postGetList( $pListHash );
 
 		if( $hashKey == 'host' ) {
-			uasort( $ret, array( $this, 'sortRefererHash' ) );
+			uasort( $ret, [ $this, 'sortRefererHash' ] );
 		}
 
 		return $ret;
 	}
 
-	function sortRefererHash( $a, $b ) {
+	public function sortRefererHash( $a, $b ) {
 		return count( $a ) < count( $b );
 	}
 
 	/**
 	 * expungeReferers will remove all referers unconditionally
 	 *
-	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool TRUE on success, FALSE on failure
 	 */
-	function expungeReferers() {
-		return( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."stats_referers`" ));
+	public function expungeReferers() {
+		return $this->mDb->query( "DELETE FROM `" . BIT_DB_PREFIX . "stats_referers`" );
 	}
 
 	/**
 	 * storeReferer will insert new record in referer table
 	 *
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
-	function storeReferer() {
+	public function storeReferer() {
 		global $gBitSystem;
 
 		if( !empty( $_SERVER['HTTP_REFERER'] ) && $parsed = parse_url( $_SERVER['HTTP_REFERER'] )) {
@@ -134,12 +142,12 @@ class Statistics extends BitBase {
 
 					$this->StartTrans();
 					$query = "UPDATE `".BIT_DB_PREFIX."stats_referers` SET `hits`=`hits`+1,`last`=? WHERE `referer`=?";
-					$this->mDb->query( $query, array( $now, $store ));
+					$this->mDb->query( $query, [ $now, $store ]);
 
 					// if the above didn't affect the db, we know that the entry doesn't exist yet.
 					if( !$this->mDb->Affected_Rows() ) {
 						$query = "INSERT INTO `".BIT_DB_PREFIX."stats_referers`( `last`, `referer`, `hits` ) VALUES( ?, ?, ? )";
-						$this->mDb->query( $query, array( $now, $store, 1 ));
+						$this->mDb->query( $query, [ $now, $store, 1 ]);
 					}
 					$this->CompleteTrans();
 				}
@@ -151,18 +159,17 @@ class Statistics extends BitBase {
 	/**
 	 * addPageview to the pageview count
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function addPageview() {
+	public function addPageview() {
 		$dayzero = mktime( 0, 0, 0, date( "m" ), date( "d" ), date( "Y" ));
 		$this->mDb->StartTrans(); // base method StartTrans will clearFromCache
 		$query = "UPDATE `".BIT_DB_PREFIX."stats_pageviews` SET `pageviews`=`pageviews`+1 WHERE `stats_day`=?";
-		$this->mDb->query( $query, array( $dayzero ));
+		$this->mDb->query( $query, [ $dayzero ]);
 		// if the above didn't affect the db, we know that the entry doesn't exist yet.
 		if( !$this->mDb->Affected_Rows() ) {
 			$query = "INSERT INTO `".BIT_DB_PREFIX."stats_pageviews`( `pageviews`, `stats_day` ) VALUES( ?, ? )";
-			$this->mDb->query( $query, array( 1, $dayzero ));
+			$this->mDb->query( $query, [ 1, $dayzero ]);
 		}
 		$this->mDb->CompleteTrans();
 	}
@@ -171,10 +178,9 @@ class Statistics extends BitBase {
 	 * registrationStats
 	 *
 	 * @param array $pPeriod
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array|bool TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
-	function registrationStats( $pPeriodFormat ) {
+	public function registrationStats( $pPeriodFormat ) {
 		global $gBitDbType;
 
 		$sqlPeriod = $this->mDb->SQLDate( $pPeriodFormat, $this->mDb->SQLIntToTimestamp( 'registration_date' ));
@@ -192,14 +198,13 @@ class Statistics extends BitBase {
 	/**
 	 * getSiteStats will get a brief overview over the site
 	 *
-	 * @access public
 	 * @return array with site stats
 	 */
-	function getSiteStats() {
+	public function getSiteStats() {
 		$ret["started"]   = $this->mDb->getOne( "SELECT MIN(`stats_day`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
 		$ret["days"]      = $this->mDb->getOne( "SELECT COUNT(*) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
 		$ret["pageviews"] = $this->mDb->getOne( "SELECT SUM(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
-		$ret["ppd"]       = ( $ret["days"] ? $ret["pageviews"] / $ret["days"] : 0 );
+		$ret["ppd"]       = $ret["days"] ? $ret["pageviews"] / $ret["days"] : 0;
 		$ret["bestpvs"]   = $this->mDb->getOne( "SELECT MAX(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
 		$ret["bestday"]   = $this->mDb->getOne( "SELECT `stats_day` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `pageviews`=?",array( (int)$ret["bestpvs"] ));
 		$ret["worstpvs"]  = $this->mDb->getOne( "SELECT MIN(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
@@ -211,10 +216,9 @@ class Statistics extends BitBase {
 	 * getContentOverview will get a simple overview based on stats available available in liberty
 	 *
 	 * @param array $pParamHash
-	 * @access public
 	 * @return array with content type stats
 	 */
-	function getContentOverview( $pParamHash = NULL ) {
+	public function getContentOverview( $pParamHash = NULL ) {
 		global $gLibertySystem;
 
 		if( empty( $pParamHash['sort_mode'] )) {
@@ -234,13 +238,12 @@ class Statistics extends BitBase {
 	/**
 	 * getContentStats will check all available content for the method Object::getStats() and will call and include the data
 	 *
-	 * @access public
 	 * @return array with content-specific stats
 	 */
-	function getContentStats() {
+	public function getContentStats() {
 		global $gLibertySystem;
 
-		$ret = array();
+		$ret = [];
 		foreach( $gLibertySystem->mContentTypes as $guid => $type ) {
 			if( $typeClass = $gLibertySystem->getContentClassName( $guid )) {
 				$object = new $typeClass();
@@ -257,32 +260,27 @@ class Statistics extends BitBase {
 	 * getPageviewChartData will fetch all data needed to create a graph with PHPlot
 	 *
 	 * @param numeric $pDays Number of days we will use to create a graph
-	 * @access public
 	 * @return array for PHPlot graph
 	 */
-	function getPageviewChartData( $pDays = 7 ) {
+	public function getPageviewChartData( $pDays = 7 ) {
 		$now = mktime( 0, 0, 0, date( "m" ), date( "d" ), date( "Y" ));
 		$dfrom = 0;
-		if( $pDays != 0 ) $dfrom = $now - ( $pDays * 24 * 60 * 60 );
+		if( $pDays != 0 ) $dfrom = $now - $pDays * 24 * 60 * 60;
 
 		$query = "SELECT `stats_day`, `pageviews` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `stats_day`<=? AND `stats_day`>=? ORDER BY `stats_day` ASC";
 		$result = $this->mDb->query( $query,array( ( int )$now, ( int )$dfrom ));
-		$ret = array();
+		$ret = [];
 		$n = ceil( $result->numRows() / 20 );
 		$i = 0;
 
 		while( $res = $result->fetchRow() ) {
-			if( $i % $n == 0 ) {
-				$data = array(
-					date( "j M Y", $res["stats_day"] ),
-					$res["pageviews"]
-				);
-			} else {
-				$data = array(
-					"",
-					$res["pageviews"]
-				);
-			}
+			$data = ( $i % $n == 0 ) ? [
+				date( "j M Y", $res["stats_day"] ),
+				$res["pageviews"],
+			] : [
+				"",
+				$res["pageviews"],
+			];
 			$ret[] = $data;
 			$i++;
 		}
@@ -293,10 +291,9 @@ class Statistics extends BitBase {
 	/**
 	 * getUsageChartData will fetch all data needed to create a graph with PHPlot
 	 *
-	 * @access public
 	 * @return array for PHPlot graph
 	 */
-	function getUsageChartData() {
+	public function getUsageChartData() {
 		global $gBitSystem, $gLibertySystem;
 		$ret['data'][0][] = 'a';
 		foreach( $gLibertySystem->mContentTypes as $contentType ) {
@@ -307,7 +304,7 @@ class Statistics extends BitBase {
 					FROM `".BIT_DB_PREFIX."liberty_content` lc
 						LEFT OUTER JOIN `".BIT_DB_PREFIX."liberty_content_hits` liberty_content_hits
 							ON (lc.`content_id` = liberty_content_hits.`content_id`)
-					WHERE content_type_guid=?", array( $guid )
+					WHERE content_type_guid=?", [ $guid ]
 				);
 				if( !empty( $hits )) {
 					$ret['legend'][] = $gLibertySystem->getContentTypeName( $guid );
@@ -321,13 +318,12 @@ class Statistics extends BitBase {
 	/**
 	 * getContentTypeChartData will fetch all data needed to create a graph with PHPlot
 	 *
-	 * @param array $pContentTypeGuid specify the content_type_guid you want to create a graph for
-	 * @access public
+	 * @param string $pContentTypeGuid specify the content_type_guid you want to create a graph for
 	 * @return array for PHPlot graph
 	 */
-	function getContentTypeChartData( $pContentTypeGuid=NULL ) {
+	public function getContentTypeChartData( $pContentTypeGuid = '' ) {
 		global $gLibertySystem;
-		$ret['data'] = array();
+		$ret['data'] = [];
 
 		if( in_array( $pContentTypeGuid, array_keys( $gLibertySystem->mContentTypes ))) {
 			$query = "
@@ -337,14 +333,14 @@ class Statistics extends BitBase {
 						ON (lc.`content_id` = liberty_content_hits.`content_id`)
 				WHERE `content_type_guid`=?
 				ORDER BY `hits` DESC";
-			$result = $this->mDb->query( $query, array( $pContentTypeGuid ), 40 );
-			$tmpHash = array();
+			$result = $this->mDb->query( $query, [ $pContentTypeGuid ], 40 );
+			$tmpHash = [];
 			// this is needed to ensure all arrays have same size
 			while( $res = $result->fetchRow() ) {
-				$tmpHash = array(
+				$tmpHash = [
 					$res['title'],
 					$res['hits'],
-				);
+				];
 			}
 			$ret['data'][$pContentTypeGuid] = array_chunk( $tmpHash, 40 );
 			$ret['title'] = $gLibertySystem->getContentTypeName( $pContentTypeGuid );
@@ -357,15 +353,15 @@ class Statistics extends BitBase {
 					ON (lc.`content_id` = liberty_content_hits.`content_id`)
 					WHERE `content_type_guid`=?
 					ORDER BY `hits` DESC";
-				$result = $this->mDb->query( $query, array( $contentType['content_type_guid'] ), 40 );
+				$result = $this->mDb->query( $query, [ $contentType['content_type_guid'] ], 40 );
 				// this is needed to ensure all arrays have same size
 				$i = 0;
-				$tmpHash = array( NULL, NULL );
+				$tmpHash = [ null, null ];
 				while( $res = $result->fetchRow() ) {
-					$tmpHash = array(
+					$tmpHash = [
 						$res['title'],
 						$res['hits'],
-					);
+					];
 				}
 			  $ret['data'][$contentType['content_type_guid']] = array_chunk( $tmpHash, 40 );
 			}
@@ -374,4 +370,3 @@ class Statistics extends BitBase {
 		return $ret;
 	}
 }
-?>

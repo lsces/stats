@@ -10,8 +10,9 @@
 /**
  * required setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
-require_once( STATS_PKG_CLASS_PATH.'Statistics.php' );
+require_once '../kernel/includes/setup_inc.php';
+use Bitweaver\KernelTools;
+use Bitweaver\Stats\Statistics;
 
 $gBitSystem->verifyPackage( 'stats' );
 $gBitSystem->verifyPermission( 'p_stats_view' );
@@ -22,5 +23,4 @@ $gBitSmarty->assign( 'siteStats', $gStats->getSiteStats() );
 $gBitSmarty->assign( 'contentOverview', $gStats->getContentOverview( $_REQUEST ));
 $gBitSmarty->assign( 'contentStats', $gStats->getContentStats() );
 
-$gBitSystem->display( 'bitpackage:stats/stats.tpl', tra( "Statistics" ) , array( 'display_mode' => 'display' ));
-?>
+$gBitSystem->display( 'bitpackage:stats/stats.tpl', KernelTools::tra( "Statistics" ) , [ 'display_mode' => 'display' ] );
