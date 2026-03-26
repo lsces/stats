@@ -16,7 +16,7 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={$gBitSystem->getConfig('google_adwordstag_id')}"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
+  window.dataLayer = window.dataLayer or [];
   function gtag(){ldelim}dataLayer.push(arguments);{rdelim}
   gtag('js', new Date());
   gtag('config', '{$gBitSystem->getConfig('google_adwordstag_id')}')
@@ -28,7 +28,7 @@
 	{if $gBitSystem->getConfig('google_analytics_ua')}
 <script async src="https://www.googletagmanager.com/gtag/js?id={$gBitSystem->getConfig('google_analytics_ua')}"></script>
 <script>
-	window.dataLayer = window.dataLayer || [];
+	window.dataLayer = window.dataLayer or [];
 	function gtag(){ldelim}dataLayer.push(arguments);{rdelim}
 	gtag('js', new Date());
 	gtag('config', '{$gBitSystem->getConfig('google_analytics_ua')}');

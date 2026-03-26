@@ -16,7 +16,9 @@
 /**
  * required setup
  */
+use Bitweaver\KernelTools;
 require_once '../kernel/includes/setup_inc.php';
+
 include_once( STATS_PKG_PATH . "Statistics.php" );
 include_once( UTIL_PKG_INCLUDE_PATH . "phplot.php" );
 global $gBitSystem;
@@ -35,8 +37,8 @@ $graph->SetPrintImage(0);
 $graph->SetPlotType( $chart_type );
 $graph->SetXTickPos( 'none' );
 //$graph->SetYScaleType( 'log' );
-$graph->SetTitle( tra( $data['title'] ) );
-$graph->SetXLabel( tra( 'Title' ) );
+$graph->SetTitle( KernelTools::tra $data['title'] ) );
+$graph->SetXLabel( KernelTools::tra 'Title' ) );
 
 $i = 0;
 foreach( $data['data'] as $guid => $info ) {
