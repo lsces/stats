@@ -7,7 +7,7 @@
 			<li><a class="item" href="{$smarty.const.STATS_PKG_URL}users.php">{booticon iname="fa-user" iexplain="User Stats"}</a></li>
 		{/if}
 	{/if}
-	{if $gBitSystem->isFeatureActive( 'stats_referers' ) and $gBitUser->hasPermission( 'p_stats_view_referer' )}
+	{if $gBitSystem->isFeatureActive( 'stats_referers' ) && $gBitUser->hasPermission( 'p_stats_view_referer' )}
 		<li><a class="item" href="{$smarty.const.STATS_PKG_URL}referrers.php">{booticon iname="fa-bullhorn" iexplain="Referer Stats"}</a></li>
 	{/if}
 </ul>

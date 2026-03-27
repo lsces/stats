@@ -20,7 +20,7 @@
 				<tr class="{cycle values="even,odd"}">
 					<td>{$timeframe}</td>
 					<td>
-					{if $gBitSystem->isFeatureActive( 'stats_referers' ) and $gBitUser->hasPermission( 'p_stats_view_referer' )}
+					{if $gBitSystem->isFeatureActive( 'stats_referers' ) && $gBitUser->hasPermission( 'p_stats_view_referer' )}
 						[<a href="{$smarty.const.STATS_PKG_URL}referrers.php?period={$smarty.request.period}&amp;timeframe={$timeframe|urlencode}">Referrers</a>]
 					{/if}
 					</td>
