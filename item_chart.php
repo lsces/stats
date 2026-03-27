@@ -17,9 +17,9 @@
  * required setup
  */
 use Bitweaver\KernelTools;
+use Bitweaver\Stats\Statistics;
 require_once '../kernel/includes/setup_inc.php';
 
-include_once( STATS_PKG_PATH . "Statistics.php" );
 include_once( UTIL_PKG_INCLUDE_PATH . "phplot.php" );
 global $gBitSystem;
 
@@ -37,8 +37,8 @@ $graph->SetPrintImage(0);
 $graph->SetPlotType( $chart_type );
 $graph->SetXTickPos( 'none' );
 //$graph->SetYScaleType( 'log' );
-$graph->SetTitle( KernelTools::tra $data['title'] ) );
-$graph->SetXLabel( KernelTools::tra 'Title' ) );
+$graph->SetTitle( KernelTools::tra ( $data['title'] ) );
+$graph->SetXLabel( KernelTools::tra ( 'Title' ) );
 
 $i = 0;
 foreach( $data['data'] as $guid => $info ) {
@@ -47,12 +47,11 @@ foreach( $data['data'] as $guid => $info ) {
 	$graph->SetXLabelAngle( ( count( $info ) > 5 ) ? 90 : 0 );
 	$graph->SetNewPlotAreaPixels( 75, 30 + ( $i * 390 ), 580, 370 + ( $i * 390 ) );
 	if( !empty( $_REQUEST['content_type_guid'] ) ) {
-		$graph->SetYLabel( $gLibertySystem->getContentTypeName( $_REQUEST['content_type_guid'] ).' '.tra( 'Hits' ).' ('.tra( "log" ).')' );
+		$graph->SetYLabel( $gLibertySystem->getContentTypeName( $_REQUEST['content_type_guid'] ).' '.KernelTools::tra( 'Hits' ).' ('.KernelTools::tra( "log" ).')' );
 	} else {
-		$graph->SetYLabel( $gLibertySystem->getContentTypeName( $guid ).' '.tra( 'Hits' ).' ('.tra( "log" ).')' );
+		$graph->SetYLabel( $gLibertySystem->getContentTypeName( $guid ).' '.KernelTools::tra( 'Hits' ).' ('.KernelTools::tra( "log" ).')' );
 	}
 	$graph->DrawGraph();
 	$i++;
 }
 $graph->PrintImage();
-?>
