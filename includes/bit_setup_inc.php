@@ -1,4 +1,5 @@
 <?php
+namespace Bitweaver\Stats;
 use Bitweaver\Stats\Statistics;
 use Bitweaver\KernelTools;
 
@@ -94,7 +95,7 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 				}
 			}
 		} else {
-//			$ret = KernelTools::tra 'Unknown URL' );
+			$ret = KernelTools::tra( 'Unknown URL' );
 		}
 		return $ret;
 	}
