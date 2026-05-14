@@ -11,10 +11,10 @@
  * @subpackage Stats
 **/
 namespace Bitweaver\Stats;
+
 use Bitweaver\BitBase;
 use Bitweaver\Liberty\LibertyContent;
 use Bitweaver\BitDb;
-
 
 class Statistics extends BitBase {
 
@@ -206,9 +206,9 @@ class Statistics extends BitBase {
 		$ret["pageviews"] = $this->mDb->getOne( "SELECT SUM(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
 		$ret["ppd"]       = $ret["days"] ? $ret["pageviews"] / $ret["days"] : 0;
 		$ret["bestpvs"]   = $this->mDb->getOne( "SELECT MAX(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
-		$ret["bestday"]   = $this->mDb->getOne( "SELECT `stats_day` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `pageviews`=?",array( (int)$ret["bestpvs"] ));
+		$ret["bestday"]   = $this->mDb->getOne( "SELECT `stats_day` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `pageviews`=?",[ (int)$ret["bestpvs"] ]);
 		$ret["worstpvs"]  = $this->mDb->getOne( "SELECT MIN(`pageviews`) FROM `".BIT_DB_PREFIX."stats_pageviews`" );
-		$ret["worstday"]  = $this->mDb->getOne( "SELECT `stats_day` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `pageviews`=?",array( (int)$ret["worstpvs"] ));
+		$ret["worstday"]  = $this->mDb->getOne( "SELECT `stats_day` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `pageviews`=?",[ (int)$ret["worstpvs"] ]);
 		return $ret;
 	}
 
@@ -268,7 +268,7 @@ class Statistics extends BitBase {
 		if( $pDays != 0 ) $dfrom = $now - $pDays * 24 * 60 * 60;
 
 		$query = "SELECT `stats_day`, `pageviews` FROM `".BIT_DB_PREFIX."stats_pageviews` WHERE `stats_day`<=? AND `stats_day`>=? ORDER BY `stats_day` ASC";
-		$result = $this->mDb->query( $query,array( ( int )$now, ( int )$dfrom ));
+		$result = $this->mDb->query( $query,[ ( int )$now, ( int )$dfrom ]);
 		$ret = [];
 		$n = ceil( $result->numRows() / 20 );
 		$i = 0;
@@ -304,7 +304,7 @@ class Statistics extends BitBase {
 					FROM `".BIT_DB_PREFIX."liberty_content` lc
 						LEFT OUTER JOIN `".BIT_DB_PREFIX."liberty_content_hits` liberty_content_hits
 							ON (lc.`content_id` = liberty_content_hits.`content_id`)
-					WHERE content_type_guid=?", [ $guid ]
+					WHERE content_type_guid=?", [ $guid ],
 				);
 				if( !empty( $hits )) {
 					$ret['legend'][] = $gLibertySystem->getContentTypeName( $guid );

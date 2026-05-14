@@ -35,7 +35,7 @@ $graph = new PHPlot( 600, 600 );
 $graph->SetDataValues( $data );
 $graph->SetTitle( KernelTools::tra( 'Total Pageviews' ) );
 $graph->SetYTitle( KernelTools::tra( 'Pageviews' ) );
-$graph->SetXTitle( KernelTools::tra( 'Time') ); 
+$graph->SetXTitle( KernelTools::tra( 'Time') );
 $graph->SetPlotType( ( count( $data ) > 50 ) ? 'lines' : 'linepoints' );
 $graph->SetDrawXDataLabels( true );
 $graph->SetXLabelAngle( 90 );

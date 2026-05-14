@@ -12,7 +12,7 @@
 use Bitweaver\BitBase;
 use Bitweaver\KernelTools;
 use Bitweaver\Stats\Statistics;
- 
+
 require_once '../kernel/includes/setup_inc.php';
 
 $gBitSystem->verifyPackage( 'stats' );
@@ -70,7 +70,7 @@ foreach( array_keys( $referers ) as $refSite ) {
 					}
 				} else {
 					// bing paid query
-					foreach( array( 'pq' => 'Paid', 'q' => 'Organic', 'p' => 'Organic', 'unknown' => 'Unknown' ) as $key=>$title ) {
+					foreach( [ 'pq' => 'Paid', 'q' => 'Organic', 'p' => 'Organic', 'unknown' => 'Unknown' ] as $key=>$title ) {
 						if( $key == 'unknown' || isset( $urlParams[$key] ) ) {
 							array_push( $subVals, $title, BitBase::getParameter( $urlParams, $key, 'unknown' ) );
 							break;
@@ -96,7 +96,7 @@ function computeStats( &$pAggregateStats, &$subStats, $revenue, &$userHash ) {
 					@$pAggregateStats[$subStatKey]['info']['orders'] += $revenue['total_orders'];
 					@$pAggregateStats[$subStatKey]['info']['users'][] = $userHash;
 					if( empty( $pAggregateStats[$subStatKey]['values'] ) ) {
-						$pAggregateStats[$subStatKey]['values'] = array();
+						$pAggregateStats[$subStatKey]['values'] = [];
 					}
 					if( $subStats ) {
 						computeStats( $pAggregateStats[$subStatKey]['values'], $subStats, $revenue, $userHash );

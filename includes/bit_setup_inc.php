@@ -1,6 +1,6 @@
 <?php
 namespace Bitweaver\Stats;
-use Bitweaver\Stats\Statistics;
+
 use Bitweaver\KernelTools;
 
 global $gBitSystem, $gBitUser ;
@@ -14,9 +14,9 @@ $pRegisterHash = [
 define( 'STATS_PKG_NAME', $pRegisterHash['package_name'] );
 define( 'STATS_PKG_URL', BIT_ROOT_URL . basename( $pRegisterHash['package_path'] ) . '/' );
 define( 'STATS_PKG_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/' );
-define( 'STATS_PKG_INCLUDE_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/'); 
+define( 'STATS_PKG_INCLUDE_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/');
 define( 'STATS_PKG_CLASS_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/classes/');
-define( 'STATS_PKG_ADMIN_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/admin/'); 
+define( 'STATS_PKG_ADMIN_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/admin/');
 
 $gBitSystem->registerPackage( $pRegisterHash );
 
@@ -42,7 +42,7 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 	}
 
 	if( !$gBitUser->isRegistered() && !empty( $_SERVER['HTTP_REFERER'] )  && strlen( $_SERVER['HTTP_REFERER'] ) > 9 ) {
-		// Explode the HTTP_REFERER address to split up the string 
+		// Explode the HTTP_REFERER address to split up the string
 		if( $ref = explode('/', $_SERVER['HTTP_REFERER']) ) {
 			if( count( $ref ) > 1 && $ref[2] != $_SERVER['HTTP_HOST'] ) {
 				// we have a standard refering URL
@@ -66,7 +66,7 @@ if( $gBitSystem->isPackageActive( 'stats' )) {
 			$pObject->CompleteTrans();
 		}
 	}
-	
+
 	function stats_user_register( &$pObject ) {
 		if( !empty( $_COOKIE['referer_url'] ) && is_a( $pObject, 'BitUser' ) && !empty( $pObject->mUserId ) ) {
 			$pObject->StartTrans();

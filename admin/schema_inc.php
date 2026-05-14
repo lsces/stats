@@ -39,17 +39,17 @@ $gBitInstaller->registerPackageInfo( STATS_PKG_NAME, [
 ] );
 
 // ### Indexes
-$indices = array (
+$indices =  [
 	'stats_referer_url_idx' => [ 'table' => 'stats_referer_urls', 'cols' => 'referer_url', 'opts' => 'UNIQUE' ],
 	'stats_referer_map_user_idx' => [ 'table' => 'stats_referer_users_map', 'cols' => 'user_id', 'opts' => null ],
-);
+];
 //	'stats_referer_map_url_idx' => [ 'table' => 'stats_referer_urls', 'cols' => 'referer_url_id', 'opts' => NULL ],
 $gBitInstaller->registerSchemaIndexes( STATS_PKG_NAME, $indices );
 
 // ### Sequences
-$sequences = array (
-	'stats_referer_url_id_seq' => [ 'start' => 1 ]
-);
+$sequences =  [
+	'stats_referer_url_id_seq' => [ 'start' => 1 ],
+];
 $gBitInstaller->registerSchemaSequences( STATS_PKG_NAME, $sequences );
 
 // ### Default Preferences
