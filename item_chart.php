@@ -20,7 +20,7 @@ use Bitweaver\KernelTools;
 use Bitweaver\Stats\Statistics;
 require_once '../kernel/includes/setup_inc.php';
 
-include_once( UTIL_PKG_INCLUDE_PATH . "phplot.php" );
+include_once( STATS_PKG_INCLUDE_PATH . "phplot.php" );
 global $gBitSystem;
 
 $gBitSystem->isPackageActive( 'stats' );
